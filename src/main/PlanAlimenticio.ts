@@ -1,10 +1,14 @@
 import { Bebida } from "./Bebida";
+import { CalificacionPlan } from "./CalificacionPlan.enum";
 import { Colacion } from "./Colacion";
 import { Comida } from "./Comida";
+import { Composicion } from "./Composicion";
 import { Duracion } from "./Duracion.enum";
 import { Objetivo } from "./Objetivo";
 import { Paciente } from "./Paciente";
 import { Profesional } from "./Profesional";
+import { TipoComida } from "./TipoComida.enum";
+import { TipoDeComposicion } from "./TipoDeComposicion.enum";
 
 export class PlanAlimenticio{
 
@@ -90,6 +94,90 @@ export class PlanAlimenticio{
         return this.objetivo
     }
 
+    public agregarObjetivo(objetivo: Objetivo){
+        this.objetivo.push(objetivo)
+    }
+
+    public agregarComida(unaComida : Comida){
+        this.comidas.push(unaComida)
+    }
+
+    public cantidadDeComida(){
+        return this.comidas.length
+    }
+
+    public calcularResultado() : CalificacionPlan{
+        var cantidadDeObjetivos = this.cantidadDeObjetivos()
+        var cantidadDeObjetivosCumplidos = this.objetivo.filter(objetivo => objetivo.getCumplido()).length
+        if(cantidadDeObjetivos === cantidadDeObjetivosCumplidos ) {
+            return CalificacionPlan.EXCELENTE
+        }
+
+        var porcentaje = ((cantidadDeObjetivosCumplidos * 100) / cantidadDeObjetivos)
+        console.log(porcentaje)
+        if(porcentaje>= 60){
+            return CalificacionPlan.MUY_BUENA
+        }
+        if(porcentaje>=50 && porcentaje<60){
+            return CalificacionPlan.BUENA
+        }
+        else{
+            return CalificacionPlan.REGULAR
+        }
+    }
+
+    public cantidadDeObjetivos() : number{
+        return this.objetivo.length
+    }
+
+    public comidasDeTipo(tipoComida: TipoComida, tipoComida2: TipoComida) {
+        return this.comidas.filter(comida => comida.getTipoDeLaComida() === tipoComida || comida.getTipoDeLaComida() === tipoComida2);
+    }
+
+
+    public cantDeComidasSegunTipo(tipoComida : TipoComida, tipoComida2:TipoComida){
+        return this.comidasDeTipo(tipoComida, tipoComida2).length
+    }
+
+    public fuerteEnProteinas(){
+       var comidasAC = this.comidasDeTipo(TipoComida.ALMUERZO,TipoComida.CENA)
+       var porcentajeProteinasTotal = 0
+       comidasAC.forEach(comida => {
+        porcentajeProteinasTotal += comida.porcentajeDeProteinas()
+        })
+        var promedio = porcentajeProteinasTotal / comidasAC.length
+
+        return promedio > 50
+    }
+
+    public bienVerde(){
+        var comidasAC = this.comidasDeTipo(TipoComida.ALMUERZO,TipoComida.CENA)
+        var porcentajeVegetalesTotal = 0
+        comidasAC.forEach(comida => {
+            porcentajeVegetalesTotal += comida.porcentajeDeVegetales()
+        });
+        var promedio = porcentajeVegetalesTotal / comidasAC.length
+
+        return promedio > 35
+    }
+
+    public cantDeColacionesPermitidas () {
+        return this.colaciones.length
+    }
+
+    public cantDeBebidasPermitidas () {
+        return this.bebidas.length
+    }
+
+    public agregarUnaColacion(colacion : Colacion){
+        this.colaciones.push(colacion)
+    }
+
+    public agregarUnaBebida(bebida : Bebida){
+        this.bebidas.push(bebida)
+    }
+
+}    
 
 
 
@@ -98,5 +186,3 @@ export class PlanAlimenticio{
 
 
 
-
-}
